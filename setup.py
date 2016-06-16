@@ -1,3 +1,4 @@
+import os
 try:
     from setuptools import setup
 except ImportError:
@@ -5,12 +6,12 @@ except ImportError:
 
 with open('README.md') as f:
     readme = f.read()
-with open('ReleaseNotes.rst') as f:
+with open(os.path.join('docs', 'release-notes.rst')) as f:
     history = f.read()
 
 setup(
     name="pykwalify",
-    version="1.5.0",
+    version="1.5.1",
     description='Python lib/cli for JSON/YAML schema validation',
     long_description=readme + '\n\n' + history,
     author="Johan Andersson",
@@ -20,6 +21,9 @@ setup(
     license='MIT',
     packages=['pykwalify'],
     url='http://github.com/grokzen/pykwalify',
+    extras_require={
+        'ruamel': ["ruamel.yaml>=0.11.0,<0.12.0"],
+    },
     entry_points={
         'console_scripts': [
             'pykwalify = pykwalify.cli:cli_entrypoint',

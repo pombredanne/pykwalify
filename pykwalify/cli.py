@@ -28,11 +28,11 @@ def parse_cli():
 usage: pykwalify -d FILE -s FILE ... [-e FILE ...] [-v ...] [-q]
 
 optional arguments:
-  -d FILE, --data-file FILE            schema definition file
+  -d FILE, --data-file FILE            the file to be tested
   -e FILE, --extension FILE            file containing python extension
   -h, --help                           show this help message and exit
   -q, --quiet                          suppress terminal output
-  -s FILE, --schema-file FILE          the file to be tested
+  -s FILE, --schema-file FILE          schema definition file
   -v, --verbose                        verbose terminal output (multiple -v increases verbosity)
   --version                            display the version number and exit
 """
@@ -49,8 +49,8 @@ optional arguments:
     # 2. validate arguments only, dont go into other code/logic
     #
 
-    log.debug("Setting verbose level: {0}".format(args["--verbose"]))
-    log.debug("Arguments from CLI: {0}".format(args))
+    log.debug("Setting verbose level: %s", args["--verbose"])
+    log.debug("Arguments from CLI: %s", args)
 
     return args
 

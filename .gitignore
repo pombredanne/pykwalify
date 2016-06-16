@@ -6,6 +6,9 @@
 # Packages
 *.egg
 *.egg-info
+docs/_build
+docs/_build_html
+.cache
 dist
 build
 eggs
@@ -22,7 +25,7 @@ lib64
 pip-log.txt
 
 # Unit test / coverage reports
-.coverage
+.coverage*
 .tox
 nosetests.xml
 htmlcov

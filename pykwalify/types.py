@@ -4,7 +4,7 @@
 
 # python stdlib
 from datetime import datetime
-from pykwalify.compat import basestring
+from pykwalify.compat import basestring, bytes
 
 DEFAULT_TYPE = "str"
 
@@ -60,11 +60,14 @@ def is_correct_type(obj, type):
 
 
 def is_string(obj):
-    return isinstance(obj, basestring)
+    return isinstance(obj, basestring) or isinstance(obj, bytes)
 
 
 def is_int(obj):
-    return isinstance(obj, int)
+    """
+    True & False is not considered valid integers even if python considers them 1 & 0 in some versions
+    """
+    return isinstance(obj, int) and not isinstance(obj, bool)
 
 
 def is_bool(obj):
@@ -72,7 +75,19 @@ def is_bool(obj):
 
 
 def is_float(obj):
-    return isinstance(obj, float)
+    """
+    Valid types are:
+     - objects of float type
+     - Strings that can be converted to float. For example '1e-06'
+    """
+    is_f = isinstance(obj, float)
+    if not is_f:
+        try:
+            float(obj)
+            is_f = True
+        except (ValueError, TypeError):
+            is_f = False
+    return is_f and not is_bool(obj)
 
 
 def is_number(obj):
@@ -108,7 +123,7 @@ def is_timestamp(obj):
     Yaml either have automatically converted it to a datetime object
     or it is a string that will be validated later.
     """
-    return isinstance(obj, datetime) or isinstance(obj, basestring)
+    return isinstance(obj, datetime) or is_string(obj) or is_int(obj) or is_float(obj)
 
 
 tt = {

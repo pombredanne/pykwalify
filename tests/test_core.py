@@ -12,7 +12,7 @@ from pykwalify.errors import SchemaError, CoreError
 
 # 3rd party imports
 import pytest
-import yaml
+from pykwalify.compat import yaml
 from testfixtures import compare
 
 
@@ -181,7 +181,9 @@ class TestCore(object):
 
     def testCoreDataMode(self):
         Core(source_data=3.14159, schema_data={"type": "number"}).validate()
+        Core(source_data="1e-06", schema_data={"type": "float"}).validate()
         Core(source_data=3.14159, schema_data={"type": "float"}).validate()
+        Core(source_data=3, schema_data={"type": "float"}).validate()
         Core(source_data=3, schema_data={"type": "int"}).validate()
         Core(source_data=True, schema_data={"type": "bool"}).validate()
         Core(source_data="foobar", schema_data={"type": "str"}).validate()
@@ -195,10 +197,10 @@ class TestCore(object):
         Core(source_data=lambda x: x, schema_data={"type": "any"}).validate()
 
         with pytest.raises(SchemaError):
-            Core(source_data="abc", schema_data={"type": "number"}).validate()
+            Core(source_data="1z-06", schema_data={"type": "float"}).validate()
 
         with pytest.raises(SchemaError):
-            Core(source_data=3, schema_data={"type": "float"}).validate()
+            Core(source_data="abc", schema_data={"type": "number"}).validate()
 
         with pytest.raises(SchemaError):
             Core(source_data=3.14159, schema_data={"type": "int"}).validate()
@@ -268,7 +270,7 @@ class TestCore(object):
                 raise e
 
             # This serve as an extra schema validation that tests more complex structures then testrule.py do
-            compare(c.root_rule._schema_str, passing_test[2], prefix="Parsed rules is not correct, something have changed...")
+            compare(c.root_rule.schema_str, passing_test[2], prefix="Parsed rules is not correct, something have changed...")
 
         for failing_test in failing_tests:
             with pytest.raises(failing_test[2], msg="Test files: {} : {}".format(", ".join(failing_test[0]), failing_test[1])):
@@ -414,6 +416,8 @@ class TestCore(object):
             ("22f.yaml", SchemaError),
             # Test keyword regex using declared matching-rule 'all'
             ("23f.yaml", SchemaError),
+            # Test that True/False is not valid integers
+            ("24f.yaml", SchemaError),
         ]
 
         # Add override magic to make it easier to test a specific file
@@ -441,7 +445,7 @@ class TestCore(object):
                 raise e
 
             # This serve as an extra schema validation that tests more complex structures then testrule.py do
-            compare(c.root_rule._schema_str, schema, prefix="Parsed rules is not correct, something have changed... files : {}".format(f))
+            compare(c.root_rule.schema_str, schema, prefix="Parsed rules is not correct, something have changed... files : {}".format(f))
 
         for failing_test, exception_type in _fail_tests:
             f = self.f(os.path.join("fail", failing_test))
